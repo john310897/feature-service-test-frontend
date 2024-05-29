@@ -74,6 +74,10 @@
   width: 100%;
 }
 
+/* audio {
+  width: 100%;
+} */
+
 @keyframes blinkAnimation {
   0% {
     opacity: 1;
