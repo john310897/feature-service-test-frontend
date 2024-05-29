@@ -9,6 +9,10 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs from 'dayjs';
+import { Grid } from '@mui/material';
+import React from 'react';
+import Accordion from 'react-bootstrap/Accordion';
+
 export const PatientList = () => {
     const [isRecording, setIsRecording] = useState(false);
     const [audioBlob, setAudioBlob] = useState(null);
@@ -49,84 +53,6 @@ export const PatientList = () => {
         }
     };
 
-    const dilogMOdal = () => {
-        return (
-            <Modal show={modalShow} onHide={closeModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Message</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <div className="input_container">
-                        <div
-                            className="input_container_group"
-                            onClickCapture={() => onParentClikc(inputRef1)}
-                        >
-                            <input
-                                className="radio_input"
-                                ref={inputRef1}
-                                type="radio"
-                                name="mode"
-                                value="voice"
-                            />
-                            Voice
-                        </div>
-                        <div
-                            className="input_container_group"
-                            onClickCapture={() => onParentClikc(inputRef2)}
-                        >
-                            <input
-                                type="radio"
-                                ref={inputRef2}
-                                className="radio_input"
-                                name="mode"
-                                value='text'
-                            />
-                            Text
-                        </div>
-                    </div>
-                    {selected?.mode === 'voice' &&
-                        <><br />
-                            <div className='audio_container'>
-                                <br />
-
-                                <div className={isRecording ? 'mic_record mic_record_blink' : 'mic_record'}>
-                                    <MicFill size='40' onClick={isRecording ? stopRecording : startRecording} />
-                                </div>
-
-                                <br />
-                                {(audioUrl && !isRecording) &&
-                                    <div style={{ margin: 'auto' }}>
-                                        <audio controls src={audioUrl}></audio>
-                                    </div>
-                                }
-                                <div className='date_time_picker'>
-                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DemoContainer components={['DatePicker']}>
-                                            <DatePicker name='date' onChange={(e) => onChange(e, 'date')} fullWidth label="Basic date picker" />
-                                        </DemoContainer>
-                                    </LocalizationProvider>
-                                </div>
-                                <div className='date_time_picker'>
-                                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                        <DemoContainer components={['TimePicker']}>
-                                            <TimePicker name='time' onChange={(e) => onChange(e, 'time')} label="Basic time picker" />
-                                        </DemoContainer>
-                                    </LocalizationProvider>
-
-                                </div>
-                                <br />
-
-                            </div><br />
-                            {(audioBlob && !isRecording) && <Button style={{ float: 'right' }} onClick={saveMessage}>Upload Audio</Button>}
-                        </>
-
-                    }
-
-
-                </Modal.Body>
-            </Modal >
-        );
-    };
 
 
     const getPatients = () => {
@@ -183,6 +109,110 @@ export const PatientList = () => {
             console.error('Error uploading audio:', error);
         }
     }
+    const dilogMOdal = () => {
+        return (
+            <Modal show={modalShow} onHide={closeModal}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Message</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="input_container">
+                        <div
+                            className="input_container_group"
+                            onClickCapture={() => onParentClikc(inputRef1)}
+                        >
+                            <input
+                                className="radio_input"
+                                ref={inputRef1}
+                                type="radio"
+                                name="mode"
+                                value="voice"
+                            />
+                            Voice
+                        </div>
+                        <div
+                            className="input_container_group"
+                            onClickCapture={() => onParentClikc(inputRef2)}
+                        >
+                            <input
+                                type="radio"
+                                ref={inputRef2}
+                                className="radio_input"
+                                name="mode"
+                                value='text'
+                            />
+                            Text
+                        </div>
+                    </div>
+                    {selected?.mode === 'voice' &&
+
+                        <Grid container spacing={2}>
+                            <Grid item xs={6} textAlign={"center"}>
+                                <MicFill size='40' style={{ margin: '5px' }} onClick={isRecording ? stopRecording : startRecording} />
+                            </Grid>
+                            {(audioUrl && !isRecording) &&
+                                <React.Fragment>
+                                    <Grid item xs={6}>
+                                        <audio style={{ width: '100%' }} controls src={audioUrl}></audio>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DemoContainer components={['DatePicker']}>
+                                                <DatePicker name='date' onChange={(e) => onChange(e, 'date')} fullWidth label="Basic date picker" />
+                                            </DemoContainer>
+                                        </LocalizationProvider>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DemoContainer components={['TimePicker']}>
+                                                <TimePicker name='time' onChange={(e) => onChange(e, 'time')} label="Basic time picker" />
+                                            </DemoContainer>
+                                        </LocalizationProvider>
+                                    </Grid>
+                                    <Grid item >
+                                        {(audioBlob && !isRecording) && <Button style={{ float: 'right' }} onClick={saveMessage}>Upload Audio</Button>}
+                                    </Grid>
+                                </React.Fragment>
+                            }
+                        </Grid>
+
+
+                    }
+
+                    <Accordion defaultActiveKey="0">
+                        <Accordion.Item eventKey="0">
+                            <Accordion.Header>Saved Messages</Accordion.Header>
+                            <Accordion.Body>
+                                <Table striped bordered hover>
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {patientMessageList?.map((message, index) => (
+                                            <tr>
+                                                <td>{index + 1}</td>
+                                                <td>{message?.date}</td>
+                                                <td>{message?.time}</td>
+                                                <td></td>
+                                            </tr>
+
+                                        ))}
+
+                                    </tbody>
+                                </Table>
+                            </Accordion.Body>
+                        </Accordion.Item>
+                    </Accordion>
+                </Modal.Body>
+            </Modal >
+        );
+    };
+
 
     return (
         <>
